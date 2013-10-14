@@ -1,0 +1,14 @@
+extends layout
+
+block content
+    .jumbotron
+        .container
+            h1 Hackathon #1
+            h2 Mon, 14 Oct. 2013
+            p Will try to create an app based on MEAN (MongoDB, ExpressJS, AngularJS and NodeJS) stack
+    .container
+        ul.nav.nav-pills.pull-right
+            li: a(href='#/view1') View1
+            li: a(href='#/view2') View2
+            li: a(href='#/view3') View3
+    .container(ng-view)

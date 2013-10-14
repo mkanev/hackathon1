@@ -19,7 +19,7 @@ module.exports = function (grunt) {
     // configurable paths
     var yeomanConfig = {
         app: 'app',
-        dist: 'dist'
+        dist: 'dist/heroku'
     };
 
     try {
@@ -29,6 +29,21 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
         yeoman: yeomanConfig,
+        express: {
+            options: {
+                port: process.env.PORT || 9000
+            },
+            dev: {
+                options: {
+                    script: 'server.js'
+                }
+            },
+            prod: {
+                options: {
+                    script: 'server.js'
+                }
+            }
+        },
         watch: {
             coffee: {
                 files: ['<%= yeoman.app %>/scripts/{,*/}*.coffee'],
@@ -42,16 +57,20 @@ module.exports = function (grunt) {
                 files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
                 tasks: ['copy:styles', 'autoprefixer']
             },
-            livereload: {
-                options: {
-                    livereload: LIVERELOAD_PORT
-                },
+            express: {
                 files: [
                     '<%= yeoman.app %>/{,*/}*.html',
-                    '.tmp/styles/{,*/}*.css',
+                    '{.tmp,<%= yeoman.app %>}/styles/{,*/}*.css',
                     '{.tmp,<%= yeoman.app %>}/scripts/{,*/}*.js',
-                    '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
-                ]
+                    '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+                    'server.js',
+                    'app/{,*/}*.{js,json}'
+                ],
+                tasks: ['express:dev'],
+                options: {
+                    livereload: true,
+                    nospawn: true //Without this option specified express won't be reloaded
+                }
             }
         },
         autoprefixer: {
@@ -65,43 +84,6 @@ module.exports = function (grunt) {
                         dest: '.tmp/styles/'
                     }
                 ]
-            }
-        },
-        connect: {
-            options: {
-                port: 9000,
-                // Change this to '0.0.0.0' to access the server from outside.
-                hostname: '0.0.0.0'
-            },
-            livereload: {
-                options: {
-                    middleware: function (connect) {
-                        return [
-                            lrSnippet,
-                            mountFolder(connect, '.tmp'),
-                            mountFolder(connect, yeomanConfig.app)
-                        ];
-                    }
-                }
-            },
-            test: {
-                options: {
-                    middleware: function (connect) {
-                        return [
-                            mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'test')
-                        ];
-                    }
-                }
-            },
-            dist: {
-                options: {
-                    middleware: function (connect) {
-                        return [
-                            mountFolder(connect, yeomanConfig.dist)
-                        ];
-                    }
-                }
             }
         },
         open: {
@@ -163,9 +145,16 @@ module.exports = function (grunt) {
         },
         // not used since Uglify task does concat,
         // but still available if needed
-        /*concat: {
-         dist: {}
-         },*/
+        //concat: {
+        //dist: {
+        // files: {
+        // '<%= yeoman.dist %>/scripts/scripts.js': [
+        // '.tmp/scripts/{,*/}*.js',
+        // '<%= yeoman.app %>/scripts/{,*/}*.js'
+        // ]
+        // }
+        // }
+        // },
         rev: {
             dist: {
                 files: {
@@ -336,26 +325,19 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('server', function (target) {
-        if (target === 'dist') {
-            return grunt.task.run(['build', 'open', 'connect:dist:keepalive']);
-        }
-
-        grunt.task.run([
-            'clean:server',
-            'concurrent:server',
-            'autoprefixer',
-            'connect:livereload',
-            'open',
-            'watch'
-        ]);
-    });
+    grunt.registerTask('server', [
+        'clean:server',
+        'concurrent:server',
+        'autoprefixer',
+        'express:dev',
+        /*'open',*/
+        'watch'
+    ]);
 
     grunt.registerTask('test', [
         'clean:server',
         'concurrent:test',
         'autoprefixer',
-        'connect:test',
         'karma'
     ]);
 

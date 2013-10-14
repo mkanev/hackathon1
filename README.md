@@ -1,4 +1,4 @@
-Hackathon #1
+Hackathon #1 [![Build Status](https://travis-ci.org/mkanev/hackathon1.png)](https://travis-ci.org/mkanev/hackathon1)
 ==========
 Mon, 14 Oct. 2013
 
