@@ -4,13 +4,12 @@ describe('Controller: MainCtrl', function () {
 
     // load the controller's module
     beforeEach(module('hackathon20131014App'));
-    beforeEach(module('ui.bootstrap'));
 
     var MainCtrl,
         scope;
 
     // Initialize the controller and a mock scope
-    beforeEach(inject(function ($controller, $rootScope) {
+    beforeEach(inject(function ($rootScope, $controller) {
         scope = $rootScope.$new();
         MainCtrl = $controller('MainCtrl', {
             $scope: scope
